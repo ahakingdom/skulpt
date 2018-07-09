@@ -2090,7 +2090,7 @@ Compiler.prototype.nameop = function (name, ctx, dataToStore) {
                 case Load:
                 case Param:
                     // Need to check that it is bound!
-                    out("if (", mangled, " === undefined) { throw new Sk.builtin.UnboundLocalError('local variable \\\'", mangled, "\\\' referenced before assignment'); }\n");
+                    out("if (", mangled, " === undefined) { throw new Sk.builtin.UnboundLocalError('local variable \\\'", mangled, "\\\' referenced before assignment'); }\nSk.lastLoaded = " + mangled + ";Sk.lastLoadedName = '" + mangled + "';\n");
                     return mangled;
                 case Store:
                     out(mangled, "=", dataToStore, ";");
@@ -2106,7 +2106,7 @@ Compiler.prototype.nameop = function (name, ctx, dataToStore) {
             switch (ctx) {
                 case Load:
                     // can't be || for loc.x = 0 or null
-                    return this._gr("loadname", mangled, "!==undefined?", mangled, ":Sk.misceval.loadname('", mangledNoPre, "',$gbl);");
+                    return this._gr("loadname", mangled, "!==undefined?", mangled, ":Sk.misceval.loadname('", mangledNoPre, "',$gbl);Sk.lastLoaded = " + mangled + ";Sk.lastLoadedName = '" + mangledNoPre + "';");
                 case Store:
                     out(mangled, "=", dataToStore, ";");
                     break;
@@ -2122,7 +2122,7 @@ Compiler.prototype.nameop = function (name, ctx, dataToStore) {
         case OP_GLOBAL:
             switch (ctx) {
                 case Load:
-                    return this._gr("loadgbl", "Sk.misceval.loadname('", mangledNoPre, "',$gbl)");
+                    return this._gr("loadgbl", "Sk.misceval.loadname('", mangledNoPre, "',$gbl);Sk.lastLoaded = $gbl." + mangledNoPre + ";Sk.lastLoadedName = '" + mangledNoPre + "';");
                 case Store:
                     out("$gbl.", mangledNoPre, "=", dataToStore, ";");
                     break;
