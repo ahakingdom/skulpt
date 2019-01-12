@@ -1633,7 +1633,7 @@ function astForIfexpr (c, n) {
  * s is a python-style string literal, including quote characters and u/r/b
  * prefixes. Returns decoded string object.
  */
-function parsestr (c, s) {
+function parsestr (c, s, return_str) {
     var encodeUtf8 = function (s) {
         return unescape(encodeURIComponent(s));
     };
@@ -1738,6 +1738,16 @@ function parsestr (c, s) {
     goog.asserts.assert(quote === "'" || quote === '"' && s.charAt(s.length - 1) === quote);
     s = s.substr(1, s.length - 2);
     if (unicode) {
+        var s_arr = s.split('\\n')
+        if (s_arr.length > 1) {
+            var clean_s_arr = []
+            for (var i = 0; i< s_arr.length; i++) {
+                var token = s_arr[i]
+                var clean_s = parsestr(c, '"'+token+'"', true)
+                clean_s_arr.push(clean_s)
+            }
+            s = clean_s_arr.join('\n')
+        }
         s = encodeUtf8(s);
     }
 
@@ -1747,9 +1757,18 @@ function parsestr (c, s) {
     }
 
     if (rawmode || s.indexOf("\\") === -1) {
-        return strobj(decodeUtf8(s));
+        if (return_str) {
+            return decodeUtf8(s)
+        } else {
+            return strobj(decodeUtf8(s));
+        }
     }
-    return strobj(decodeEscape(s, quote));
+    if (return_str) {
+        return decodeEscape(s, quote);
+    } else {
+        return strobj(decodeEscape(s, quote));
+    }
+
 }
 
 function parsestrplus (c, n) {
@@ -1759,7 +1778,7 @@ function parsestrplus (c, n) {
     ret = new Sk.builtin.str("");
     for (i = 0; i < NCH(n); ++i) {
         try {
-            ret = ret.sq$concat(parsestr(c, CHILD(n, i).value));
+            ret = ret.sq$concat(parsestr(c, CHILD(n, i).value, false));
         } catch (x) {
             throw new Sk.builtin.SyntaxError("invalid string (possibly contains a unicode character)", c.c_filename, CHILD(n, i).lineno);
         }
