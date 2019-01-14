@@ -585,6 +585,44 @@ Sk.misceval.objectRepr = function (v) {
 };
 goog.exportSymbol("Sk.misceval.objectRepr", Sk.misceval.objectRepr);
 
+
+Sk.misceval.objectReprAha = function (v) {
+    goog.asserts.assert(v !== undefined, "trying to repr undefined");
+    if ((v === null) || (v instanceof Sk.builtin.none)) {
+        return new Sk.builtin.str("None");
+    } else if (v === true) {
+        // todo; these should be consts
+        return new Sk.builtin.str("True");
+    } else if (v === false) {
+        return new Sk.builtin.str("False");
+    } else if (typeof v === "number") {
+        return new Sk.builtin.str("" + v);
+    } else if (!v["$r"]) {
+        if (v.tp$name) {
+            return new Sk.builtin.str("<" + v.tp$name + " object>");
+        } else {
+            return new Sk.builtin.str("<unknown>");
+        }
+    } else if (v.constructor === Sk.builtin.float_) {
+        if (v.v === Infinity) {
+            return new Sk.builtin.str("inf");
+        } else if (v.v === -Infinity) {
+            return new Sk.builtin.str("-inf");
+        } else {
+            return v["$r"]();
+        }
+    } else if (v.constructor === Sk.builtin.int_) {
+        return v["$r"]();
+    } else if (v instanceof Sk.builtin.str || v instanceof Sk.builtin.dict) {
+        return v["$aha_r"]();
+    } else {
+        return v["$r"]();
+    }
+};
+goog.exportSymbol("Sk.misceval.objectReprAha", Sk.misceval.objectReprAha);
+
+
+
 Sk.misceval.opAllowsEquality = function (op) {
     switch (op) {
         case "LtE":

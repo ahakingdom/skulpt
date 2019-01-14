@@ -242,6 +242,31 @@ Sk.builtin.dict.prototype["$r"] = function () {
     return new Sk.builtin.str("{" + ret.join(", ") + "}");
 };
 
+
+Sk.builtin.dict.prototype["$aha_r"] = function () {
+    var v;
+    var iter, k;
+    var ret = [];
+    for (iter = Sk.abstr.iter(this), k = iter.tp$iternext();
+         k !== undefined;
+         k = iter.tp$iternext()) {
+        v = this.mp$subscript(k);
+        if (v === undefined) {
+            //print(k, "had undefined v");
+            v = null;
+        }
+
+        // we need to check if value is same as object
+        // otherwise it would cause an stack overflow
+        if(v === this) {
+            ret.push(Sk.misceval.objectReprAha(k).v + ": {...}");
+        } else {
+            ret.push(Sk.misceval.objectReprAha(k).v + ": " + Sk.misceval.objectReprAha(v).v);
+        }
+    }
+    return new Sk.builtin.str("{" + ret.join(", ") + "}");
+};
+
 Sk.builtin.dict.prototype.mp$length = function () {
     return this.size;
 };

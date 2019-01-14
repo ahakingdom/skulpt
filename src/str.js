@@ -221,6 +221,41 @@ Sk.builtin.str.prototype["$r"] = function () {
     return new Sk.builtin.str(ret);
 };
 
+Sk.builtin.str.prototype["$aha_r"] = function () {
+    // single is preferred
+    var ashex;
+    var c;
+    var i;
+    var ret;
+    var len;
+    var quote = '"';
+
+    len = this.v.length;
+    ret = quote;
+    for (i = 0; i < len; ++i) {
+        c = this.v.charAt(i);
+        if (c === quote || c === "\\") {
+            ret += "\\" + c;
+        } else if (c === "\t") {
+            ret += "\\t";
+        } else if (c === "\n") {
+            ret += "\\n";
+        } else if (c === "\r") {
+            ret += "\\r";
+        } else if (c < " " || c >= 0x7f) {
+            ashex = c.charCodeAt(0).toString(16);
+            if (ashex.length < 2) {
+                ashex = "0" + ashex;
+            }
+            ret += "\\x" + ashex;
+        } else {
+            ret += c;
+        }
+    }
+    ret += quote;
+    return new Sk.builtin.str(ret);
+};
+
 
 Sk.builtin.str.re_escape_ = function (s) {
     var c;
