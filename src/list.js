@@ -166,6 +166,19 @@ Sk.builtin.list.prototype["$r"] = function () {
     return new Sk.builtin.str("[" + ret.join(", ") + "]");
 };
 
+Sk.builtin.list.prototype["$aha_r"] = function () {
+    var it, i;
+    var ret = [];
+    for (it = Sk.abstr.iter(this), i = it.tp$iternext(); i !== undefined; i = it.tp$iternext()) {
+        if(i === this) {
+            ret.push("[...]");
+        } else {
+            ret.push(Sk.misceval.objectReprAha(i).v);
+        }
+    }
+    return new Sk.builtin.str("[" + ret.join(", ") + "]");
+};
+
 Sk.builtin.list.prototype.tp$richcompare = function (w, op) {
     // todo; can't figure out where cpy handles this silly case (test/run/t96.py)
     // perhaps by trapping a stack overflow? otherwise i'm not sure for more

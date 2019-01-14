@@ -31,6 +31,13 @@ Sk.builtin.bool.prototype["$r"] = function () {
     return new Sk.builtin.str("False");
 };
 
+Sk.builtin.bool.prototype["$aha_r"] = function () {
+    if (this.v) {
+        return new Sk.builtin.str("true");
+    }
+    return new Sk.builtin.str("false");
+};
+
 Sk.builtin.bool.prototype.tp$hash = function () {
     return new Sk.builtin.int_(this.v);
 };

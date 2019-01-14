@@ -589,12 +589,12 @@ goog.exportSymbol("Sk.misceval.objectRepr", Sk.misceval.objectRepr);
 Sk.misceval.objectReprAha = function (v) {
     goog.asserts.assert(v !== undefined, "trying to repr undefined");
     if ((v === null) || (v instanceof Sk.builtin.none)) {
-        return new Sk.builtin.str("None");
+        return new Sk.builtin.str("null");
     } else if (v === true) {
         // todo; these should be consts
-        return new Sk.builtin.str("True");
+        return new Sk.builtin.str("true");
     } else if (v === false) {
-        return new Sk.builtin.str("False");
+        return new Sk.builtin.str("false");
     } else if (typeof v === "number") {
         return new Sk.builtin.str("" + v);
     } else if (!v["$r"]) {
@@ -613,7 +613,7 @@ Sk.misceval.objectReprAha = function (v) {
         }
     } else if (v.constructor === Sk.builtin.int_) {
         return v["$r"]();
-    } else if (v instanceof Sk.builtin.str || v instanceof Sk.builtin.dict) {
+    } else if (v instanceof Sk.builtin.str || v instanceof Sk.builtin.dict || v instanceof Sk.builtin.bool || v instanceof Sk.builtin.list) {
         return v["$aha_r"]();
     } else {
         return v["$r"]();
