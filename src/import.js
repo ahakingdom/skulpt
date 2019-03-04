@@ -98,9 +98,10 @@ Sk.loadExternalLibrary = function (name) {
     }
 
     if (ext === "js") {
-        co = { funcname: "$builtinmodule", code: module };
+        co = { funcname: "$builtinmodule", code: module , origin_code: module};
     } else {
         co = Sk.compile(module, path, "exec", true);
+        co.origin_code = module;
     }
 
     Sk.externalLibraryCache[name] = co;
@@ -350,6 +351,7 @@ Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canS
     if (suppliedPyBody) {
         filename = name + ".py";
         co = Sk.compile(suppliedPyBody, filename, "exec", canSuspend);
+        co.origin_code = suppliedPyBody;
     } else {
         // If an onBeforeImport method is supplied, call it and if
         // the result is false or a string, prevent the import.
@@ -387,8 +389,17 @@ Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canS
                     return compileReadCode(Sk.importSearchPathForName(name, ".py", false, canSuspend, currentDir));
                 } else {
                     filename = codeAndPath.filename;
-                    return isPy ? Sk.compile(codeAndPath.code, codeAndPath.filename, "exec", canSuspend)
-                        : { funcname: "$builtinmodule", code: codeAndPath.code };
+                    var return_module;
+                    if (isPy) {
+                        return_module = Sk.compile(codeAndPath.code, codeAndPath.filename, "exec", canSuspend);
+                        return_module.origin_code = codeAndPath.code;
+                    } else {
+                        return_module = { funcname: "$builtinmodule", code: codeAndPath.code , origin_code: codeAndPath.code};
+                    }
+                    return return_module
+                    // var py_module = Sk.compile(codeAndPath.code, codeAndPath.filename, "exec", canSuspend)
+                    // return isPy ? Sk.compile(codeAndPath.code, codeAndPath.filename, "exec", canSuspend)
+                    //     : { funcname: "$builtinmodule", code: codeAndPath.code };
                 }
             })(codeAndPath);
         }
